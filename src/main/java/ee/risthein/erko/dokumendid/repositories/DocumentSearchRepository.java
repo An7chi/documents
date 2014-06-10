@@ -30,8 +30,6 @@ public class DocumentSearchRepository {
                 .append("from document d ")
                 .append("left join document_doc_catalog ddc on d.document = ddc.document_fk ")
                 .append("left join doc_catalog dc on ddc.doc_catalog_fk = dc.doc_catalog ")
-//                .append("left join doc_attribute da on d.document = da.document_fk ")
-//                .append("left join doc_attribute_type dat on da.doc_attribute_type_fk = dat.doc_attribute_type ")
                 .append("where 1=1 ");
 
         if (form.getDocumentId() != null) {

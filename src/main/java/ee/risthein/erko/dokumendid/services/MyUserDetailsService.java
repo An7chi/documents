@@ -26,8 +26,6 @@ public class MyUserDetailsService implements UserDetailsService {
 
         UserAccount account = userAccountRepository.findByUsername(username);
 
-        System.out.println(account);
-
         if (account == null) {
             throw new UsernameNotFoundException("No such userAccount: " + username);
         }

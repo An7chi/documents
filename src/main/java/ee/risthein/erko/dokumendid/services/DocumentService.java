@@ -59,7 +59,6 @@ public class DocumentService {
     }
 
     public Document getDocument(Integer id) {
-        log.debug("FIND ONE");
         return documentRepository.findOne(id);
     }
 
@@ -70,7 +69,7 @@ public class DocumentService {
         addDocAttributes(document, docType);
         document.setDocType(docType);
         document.setCreatedBy(getAccountId());
-        log.info("New document: " + document);
+        log.debug("New document: " + document);
         return document;
     }
 
@@ -161,7 +160,7 @@ public class DocumentService {
             oldDocStatus.setStatusEnd(currentTime);
             createNewDocStatus(document, currentTime);
         }
-        log.debug("old status with: " + oldDocStatus);
+        log.debug("Old status with: " + oldDocStatus);
     }
 
     private void createNewDocStatus(Document document, Date currentTime) {
@@ -171,7 +170,7 @@ public class DocumentService {
         newDocStatus.setStatusBegin(currentTime);
         newDocStatus.setCreatedBy(getAccountId());
         document.addDocStatus(newDocStatus);
-        log.debug("new status: " + newDocStatus);
+        log.debug("New status: " + newDocStatus);
     }
 
     private void addDocAttributes(Document document, DocType docType) {

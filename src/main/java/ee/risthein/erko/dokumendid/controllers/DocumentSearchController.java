@@ -33,7 +33,6 @@ public class DocumentSearchController {
     @RequestMapping(value = "/search", method = POST)
     public String saveDocument(DocumentSearchForm form, Model model) {
         List<Document> result = documentService.search(form);
-        System.out.println("#### search result: " + result);
         model.addAttribute("documents", result);
         return "documentSearch";
     }
