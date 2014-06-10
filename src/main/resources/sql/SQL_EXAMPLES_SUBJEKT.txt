@@ -1,0 +1,107 @@
+/* SQL paringute naiteid ylesande SUBJEKTID andmebaasis */
+/* kliendi nr. 1 andmete paring , klient on eraisik*/
+
+SELECT C.customer, P.person FROM customer C INNER JOIN person P ON  C.subject_fk=P.person WHERE C.subject_type_fk=1 AND C.customer = 1;
+
+/* kliendi nr. 1 atribuutide paring */
+SELECT C.customer, P.person,P.first_name, P.last_name, SAT.type_name, SA.value_text, SA.value_number FROM customer C INNER JOIN person P ON  C.subject_fk=P.person 
+LEFT JOIN subject_attribute SA ON C.customer=SA.subject_fk INNER JOIN subject_attribute_type SAT ON SA.subject_attribute_type_fk = SAT.subject_attribute_type 
+WHERE C.subject_type_fk=1 AND SA.subject_type_fk=4 AND C.customer = 1;
+
+/* tootaja nr. 1 atribuutide paring */
+
+SELECT E.employee, P.person,P.first_name, P.last_name, SAT.type_name, SA.value_number, SA.value_text FROM employee E INNER JOIN person P ON  E.person_fk=P.person 
+LEFT JOIN subject_attribute SA ON E.employee=SA.subject_fk INNER JOIN subject_attribute_type SAT ON SA.subject_attribute_type_fk = SAT.subject_attribute_type 
+WHERE SA.subject_type_fk=3 AND E.employee = 1;
+
+/* isiku nr. 1 kontaktide paring */
+
+SELECT P.person,P.first_name, P.last_name,CT.type_name,CNT.value_text, CNT.note FROM person P LEFT JOIN contact CNT ON P.person = CNT.subject_fk 
+INNER JOIN contact_type CT ON CNT.contact_type_fk= CT.contact_type
+WHERE CNT.subject_type_fk = 1 AND P.person =1 ;
+
+/* isiku nr. 1 aadresside paring */
+
+SELECT P.person,P.first_name, P.last_name,AT.type_name,A.country, A.county, A.town_village, A.street_address, A.zipcode FROM person P 
+LEFT JOIN address A ON P.person = A.subject_fk INNER JOIN address_type AT ON A.address_type_fk = AT.address_type
+WHERE A.subject_type_fk = 1 AND P.person =1 ;
+
+/* ettevotte nr. 2 pohiandmete ja aadresside paring */
+
+SELECT E.enterprise,E.name, E.full_name,AT.type_name,A.country, A.county, A.town_village, A.street_address, A.zipcode FROM enterprise E 
+LEFT JOIN address A ON E.enterprise = A.subject_fk INNER JOIN address_type AT ON A.address_type_fk = AT.address_type
+WHERE A.subject_type_fk = 2 AND E.enterprise =2 ;
+
+/* ettevottega nr. 2 seotud esindaja nimi ja personaalne kontakt */
+
+SELECT E.enterprise,E.name, E.full_name,ENT_REP.first_name, ENT_REP.last_name,CT.type_name,CNT.value_text, CNT.note  
+FROM enterprise E LEFT JOIN enterprise_person_relation EPR ON E.enterprise = EPR.enterprise_fk INNER JOIN person ENT_REP ON EPR.person_fk = ENT_REP.person
+LEFT JOIN contact CNT ON ENT_REP.person = CNT.subject_fk INNER JOIN contact_type CT ON CNT.contact_type_fk= CT.contact_type
+WHERE CNT.subject_type_fk = 1 AND E.enterprise =2 ;
+
+
+/* ettevotte nr. 2 atribuutide paring */
+
+SELECT E.enterprise,E.name, E.full_name, SAT.type_name, SA.value_number, SA.value_text FROM enterprise E
+LEFT JOIN subject_attribute SA ON E.enterprise=SA.subject_fk INNER JOIN subject_attribute_type SAT ON SA.subject_attribute_type_fk = SAT.subject_attribute_type 
+WHERE SA.subject_type_fk=2 AND E.enterprise = 2;
+
+
+/* taistekstiotsing (full-text search) ettevotte atribuutide value_text valjadest */
+/* otsitakse koiki ettevotteid mille atribuutides sisaldub sona "torutood" */
+
+SELECT E.enterprise,E.name, E.full_name, SAT.type_name, SA.value_number, SA.value_text FROM enterprise E
+INNER JOIN subject_attribute SA ON E.enterprise=SA.subject_fk INNER JOIN subject_attribute_type SAT ON SA.subject_attribute_type_fk = SAT.subject_attribute_type
+WHERE SA.subject_type_fk=2 AND E.enterprise = 2 AND to_tsvector(SA.value_text) @@ to_tsquery('torutood');
+
+/* taistekstiotsing (full-text search) kliendi kontaktide hulgast - millise isiku kontaktides sisaldub fragment 'marten' */
+
+SELECT P.person,P.first_name, P.last_name,CT.type_name,CNT.value_text, CNT.note FROM person P LEFT JOIN contact CNT ON P.person = CNT.subject_fk 
+INNER JOIN contact_type CT ON CNT.contact_type_fk= CT.contact_type
+WHERE CNT.subject_type_fk = 1 AND CNT.value_text LIKE 'marten%';
+
+/* otsime kõikide subjektide hulgast nime jargi */
+SELECT P.subject_id ,P.subject_name, P.subject_type FROM 
+(SELECT person AS subject_id, 'isik'  AS subject_type, last_name AS subject_name FROM person WHERE UPPER(last_name) LIKE UPPER('toru%') 
+UNION SELECT enterprise AS subject_id, 'ettevote'  AS subject_type, name AS subject_name FROM enterprise WHERE UPPER(name) LIKE UPPER('toru%' )) AS P;
+
+/* isiku nr. 4 atribuutide andmed juhul kui see isik on ka klient - kahe eraldi paringuga */
+
+SELECT CUSTOMER_ATTRIBUTES.subject_attribute AS attribute_id,CAT.type_name AS type_name,
+CUSTOMER_ATTRIBUTES.value_text AS text_value,CUSTOMER_ATTRIBUTES.value_number AS number_value FROM person P LEFT JOIN customer C ON P.person = C.subject_fk 
+LEFT JOIN  subject_attribute CUSTOMER_ATTRIBUTES ON C.customer = CUSTOMER_ATTRIBUTES.subject_fk
+LEFT JOIN subject_attribute_type CAT ON CUSTOMER_ATTRIBUTES.subject_attribute_type_fk=CAT.subject_attribute_type 
+WHERE (C.subject_type_fk=1 OR C.subject_type_fk IS NULL)
+AND (CUSTOMER_ATTRIBUTES.subject_type_fk=4 OR CUSTOMER_ATTRIBUTES.subject_type_fk IS NULL )
+AND P.person=4;
+
+SELECT PERSON_ATTRIBUTES.subject_attribute ASattribute_id,PAT.type_name AS type_name,
+PERSON_ATTRIBUTES.value_text AS text_value,PERSON_ATTRIBUTES.value_number AS number_value 
+FROM person P LEFT JOIN subject_attribute PERSON_ATTRIBUTES ON P.person = PERSON_ATTRIBUTES.subject_fk 
+LEFT JOIN subject_attribute_type PAT ON PERSON_ATTRIBUTES.subject_attribute_type_fk=PAT.subject_attribute_type 
+WHERE (PERSON_ATTRIBUTES.subject_type_fk=1 OR PERSON_ATTRIBUTES.subject_type_fk IS NULL)  
+AND P.person=4;
+
+/* isiku nr. 4 atribuutide andmed juhul kui see isik on ka klient - yhe UNION paringuna*/
+
+SELECT U.person_or_client_attribute,U.attribute_id, U.type_name, U.text_value, U.number_value FROM 
+(
+SELECT 1 AS person_or_client_attribute, CUSTOMER_ATTRIBUTES.subject_attribute AS attribute_id,CAT.type_name AS type_name,
+CUSTOMER_ATTRIBUTES.value_text AS text_value,CUSTOMER_ATTRIBUTES.value_number AS number_value FROM person P LEFT JOIN customer C ON P.person = C.subject_fk 
+LEFT JOIN  subject_attribute CUSTOMER_ATTRIBUTES ON C.customer = CUSTOMER_ATTRIBUTES.subject_fk
+LEFT JOIN subject_attribute_type CAT ON CUSTOMER_ATTRIBUTES.subject_attribute_type_fk=CAT.subject_attribute_type 
+WHERE (C.subject_type_fk=1 OR C.subject_type_fk IS NULL)
+AND (CUSTOMER_ATTRIBUTES.subject_type_fk=4 OR CUSTOMER_ATTRIBUTES.subject_type_fk IS NULL )
+AND P.person=4 
+UNION 
+SELECT 2 AS person_or_client_attribute, PERSON_ATTRIBUTES.subject_attribute ASattribute_id,PAT.type_name AS type_name,
+PERSON_ATTRIBUTES.value_text AS text_value,PERSON_ATTRIBUTES.value_number AS number_value 
+FROM person P LEFT JOIN subject_attribute PERSON_ATTRIBUTES ON P.person = PERSON_ATTRIBUTES.subject_fk 
+LEFT JOIN subject_attribute_type PAT ON PERSON_ATTRIBUTES.subject_attribute_type_fk=PAT.subject_attribute_type 
+WHERE (PERSON_ATTRIBUTES.subject_type_fk=1 OR PERSON_ATTRIBUTES.subject_type_fk IS NULL)  
+AND P.person=4 ) AS U ORDER BY U.person_or_client_attribute;
+
+/* tootaja kasutajanimega 'marten' logib systeemi sisse  */
+SELECT E.employee,UA.user_account, P.first_name, P.last_name FROM employee E INNER JOIN user_account UA ON E.employee = UA.subject_fk 
+INNER JOIN person P ON E.person_fk = P.person
+WHERE UA.subject_type_fk = 3  AND UA.username='marten'  AND UA.passw='37b4931088193a73b6561bae19bf06d9';

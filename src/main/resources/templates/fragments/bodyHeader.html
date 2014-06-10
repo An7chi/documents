@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8"/>
+    <title>bodyHeader</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css"/>
+
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker3.min.css"/>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.min.js"></script>
+
+    <link rel="stylesheet" href="../../webapp/css/style.css" th:href="@{/css/style.css}"/>
+    <script src="../../webapp/js/script.js" th:src="@{/js/script.js}"></script>
+</head>
+
+<body th:fragment="bodyHeader">
+
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#" th:href="@{|/|}">Documents</a>
+        </div>
+        <div class="navbar-collapse collapse">
+
+            <ul class="nav navbar-nav">
+                <li><a href="documentList.html" th:href="@{|/catalog|}">Browse</a></li>
+                <li><a href="documentSearch.html" th:href="@{|/search|}">Search</a></li>
+            </ul>
+
+            <form class="navbar-form navbar-right" role="form" th:action="@{/logout}" method="post">
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Sign Out</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+</body>
+
+</html>

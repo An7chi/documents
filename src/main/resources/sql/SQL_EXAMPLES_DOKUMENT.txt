@@ -1,0 +1,40 @@
+/* kysime dokumendi mille nimes sisaldub  "Metsa" ja koik tema atribuudid */
+
+SELECT D.document,D.name, DA.type_name, DA.value_text FROM document D LEFT JOIN doc_attribute DA ON D.document = DA.doc_attribute 
+WHERE (to_tsvector(D.name) @@ to_tsquery('Metsa'));
+
+/* kysime dokumendi mille atribuudites  sisaldub sona "Kiik" */
+
+SELECT D.document,D.name FROM document D INNER JOIN doc_attribute DA ON D.document = DA.doc_attribute 
+WHERE (to_tsvector(DA.value_text) @@ to_tsquery('Kiik'));
+
+/* kysime dokumendid kataloogist nimega "teabenouded" ja "puhkusegraafikud" */
+
+SELECT D.document, D.name FROM doc_catalog DC LEFT JOIN document_doc_catalog DDC ON DC.doc_catalog= DDC.doc_catalog_fk
+LEFT JOIN document D ON DDC.document_fk = D.document  AND (DC.name LIKE 'teabenouded' OR DC.name LIKE 'puhkusegraafikud');
+
+
+/*  kysime koik ettevottega "Torupood" seotud dokumendid */
+/* 	PostgreSQL otsing on vaikimisi tostutundlik, seeprast teisendame molemad pooled UPPER-isse */
+
+SELECT E.enterprise, E.name FROM enterprise E LEFT JOIN doc_subject DS ON E.enterprise = DS.subject_fk 
+WHERE DS.doc_subject_type_fk = 2 AND UPPER(E.name) LIKE UPPER('Toru%');
+
+/* Otsime koiki dokumente kataloogis 4 mis on tyypi 10 (teabenoue) */
+SELECT D.document AS dokumendi_id, D.name, DT.type_name AS dokumendi_tyyp FROM doc_catalog DC LEFT JOIN document_doc_catalog DDC ON DC.doc_catalog = DDC.doc_catalog_fk
+INNER JOIN document D ON DDC.document_fk = D.document INNER JOIN document_doc_type DDT ON D.document = DDT.document_fk 
+INNER JOIN doc_type DT ON DDT.doc_type_fk = DT.doc_type
+WHERE DC.doc_catalog = 4 AND DDT.doc_type_fk = 10;
+
+/* dokumendi nr.1 andmed - tabelitest [document] ja [doc_attribute] */
+
+SELECT D.document,DAT.type_name, DA.value_text,DA.doc_attribute_type_fk, DA.value_number, DA.value_date,DA.atr_type_selection_value_fk FROM document D 
+LEFT JOIN doc_attribute DA ON D.document = DA.document_fk
+INNER JOIN doc_attribute_type DAT ON DA.doc_attribute_type_fk = DAT.doc_attribute_type
+WHERE D.document = 1 ORDER BY DA.orderby;
+
+
+/* tootaja kasutajanimega 'marten' logib systeemi sisse  */
+SELECT E.employee,UA.user_account, P.first_name, P.last_name FROM employee E INNER JOIN user_account UA ON E.employee = UA.subject_fk 
+INNER JOIN person P ON E.person_fk = P.person
+WHERE UA.subject_type_fk = 3  AND UA.username='marten'  AND UA.passw='37b4931088193a73b6561bae19bf06d9';

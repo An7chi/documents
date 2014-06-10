@@ -1,0 +1,405 @@
+CREATE TABLE data_type 
+( data_type numeric(10,0) NOT NULL ,
+  type_name varchar(200),
+  CONSTRAINT data_type_pk PRIMARY KEY (data_type)
+) ;
+
+
+CREATE SEQUENCE document_id ;
+
+CREATE TABLE document 
+( document numeric(10,0) NOT NULL DEFAULT nextval('document_id'),
+  doc_nr text,
+  name text,
+  description text,
+  created timestamp,
+  created_by numeric(10,0),
+  updated timestamp,
+  updated_by numeric(10,0),
+  doc_status_type_fk numeric(10,0),
+  filename text,
+  CONSTRAINT document_pk PRIMARY KEY (document)
+) ;
+
+CREATE SEQUENCE document_doc_type_id ;
+
+CREATE TABLE document_doc_type 
+( document_doc_type numeric(10,0) NOT NULL DEFAULT nextval('document_doc_type_id'),
+  doc_type_fk numeric(10,0),
+  document_fk numeric(10,0),
+  CONSTRAINT document_doc_type_pk PRIMARY KEY (document_doc_type)
+) ;
+
+CREATE SEQUENCE doc_type_id ;
+
+CREATE TABLE doc_type 
+( doc_type numeric(10,0) NOT NULL DEFAULT nextval('doc_type_id'),
+  super_type_fk numeric(10,0),
+  level numeric(10,0),
+  type_name varchar(200),
+  CONSTRAINT doc_type_pk PRIMARY KEY (doc_type)
+) ;
+
+CREATE TABLE doc_catalog_type 
+( doc_catalog_type numeric(10,0) NOT NULL ,
+  type_name varchar(200),
+  CONSTRAINT doc_catalog_type_pk PRIMARY KEY (doc_catalog_type)
+) ;
+
+
+CREATE SEQUENCE doc_catalog_id ;
+
+CREATE TABLE doc_catalog
+( doc_catalog numeric(10,0) NOT NULL DEFAULT nextval('doc_catalog_id'),
+  catalog_owner_fk numeric(10,0),
+  doc_catalog_type_fk numeric(10,0),
+  name text,
+  description text,
+  level numeric(10,0),
+  content_updated timestamp,
+  content_updated_by numeric(10,0),
+  upper_catalog_fk numeric(10,0),
+  folder text,
+  CONSTRAINT doc_catalog_pk PRIMARY KEY (doc_catalog)
+) ;
+
+CREATE SEQUENCE document_doc_catalog_id ;
+
+CREATE TABLE document_doc_catalog
+( document_doc_catalog numeric(10,0) NOT NULL DEFAULT nextval('document_doc_catalog_id'),
+  document_fk numeric(10,0),
+  doc_catalog_fk numeric(10,0),
+  catalog_time timestamp,
+  CONSTRAINT document_doc_catalog_pk PRIMARY KEY (document_doc_catalog)
+) ;
+
+CREATE SEQUENCE doc_status_type_id ;
+
+CREATE TABLE doc_status_type 
+( doc_status_type numeric(10,0) NOT NULL DEFAULT nextval('doc_status_type_id'),
+  type_name varchar(200),
+  CONSTRAINT doc_status_type_pk PRIMARY KEY (doc_status_type)
+) ;
+
+CREATE SEQUENCE doc_status_id ;
+
+CREATE TABLE doc_status
+( doc_status numeric(10,0) NOT NULL DEFAULT nextval('doc_status_id'),
+  document_fk numeric(10,0),
+  doc_status_type_fk numeric(10,0),
+  status_begin timestamp,
+  status_end timestamp,
+  created_by numeric(10,0),
+  CONSTRAINT doc_status_pk PRIMARY KEY (doc_status)
+) ;
+
+
+CREATE SEQUENCE doc_attribute_id ;
+
+CREATE TABLE doc_attribute
+( doc_attribute numeric(10,0) NOT NULL DEFAULT nextval('doc_attribute_id'),
+  atr_type_selection_value_fk numeric(10,0),
+  doc_attribute_type_fk numeric(10,0),
+  document_fk numeric(10,0),
+  type_name text,
+  value_text text,
+  value_number numeric,
+  value_date date,
+  data_type numeric(1,0),
+  orderby numeric(10,0),
+  required varchar(1),
+  CONSTRAINT doc_attribute_pk PRIMARY KEY (doc_attribute)
+) ;
+
+
+CREATE SEQUENCE doc_type_attribute_id ;
+
+CREATE TABLE doc_type_attribute
+( doc_type_attribute numeric(10,0) NOT NULL DEFAULT nextval('doc_type_attribute_id'),
+  doc_attribute_type_fk numeric(10,0),
+  doc_type_fk numeric(10,0),
+  orderby numeric(10,0),
+  required varchar(1),
+  created_by_default varchar(1),
+  CONSTRAINT doc_type_attribute_pk PRIMARY KEY (doc_type_attribute)
+) ;
+
+CREATE SEQUENCE doc_attribute_type_id ;
+
+CREATE TABLE doc_attribute_type
+( doc_attribute_type numeric(10,0) NOT NULL DEFAULT nextval('doc_attribute_type_id'),
+  default_selection_id_fk numeric(10,0),
+  type_name text,
+  default_value_text text,
+  data_type_fk numeric(1,0),
+  multiple_attributes varchar(1),
+  CONSTRAINT doc_attribute_type_pk PRIMARY KEY (doc_attribute_type)
+) ;
+
+
+CREATE SEQUENCE atr_type_selection_value_id ;
+
+CREATE TABLE atr_type_selection_value
+( atr_type_selection_value numeric(10,0) NOT NULL DEFAULT nextval('atr_type_selection_value_id'),
+  doc_attribute_type_fk numeric(10,0),
+  value_text text,
+  orderby numeric(10,0),
+  CONSTRAINT atr_type_selection_value_pk PRIMARY KEY (atr_type_selection_value)
+) ;
+
+
+CREATE SEQUENCE doc_subject_id ;
+
+CREATE TABLE doc_subject
+( doc_subject numeric(10,0) NOT NULL DEFAULT nextval('doc_subject_id'),
+  doc_subject_relation_type_fk numeric(10,0),
+  doc_subject_type_fk numeric(10,0),
+  document_fk numeric(10,0),
+  subject_fk numeric(10,0),
+  note text,
+  CONSTRAINT doc_subject_pk PRIMARY KEY (doc_subject)
+) ;
+
+CREATE TABLE doc_subject_type
+( doc_subject_type numeric(10,0) NOT NULL ,
+  type_name varchar(200),
+  CONSTRAINT doc_subject_type_pk PRIMARY KEY (doc_subject_type)
+) ;
+
+CREATE TABLE doc_subject_relation_type
+( doc_subject_relation_type numeric(10,0) NOT NULL ,
+  type_name varchar(200),
+  CONSTRAINT doc_subject_relation_type_pk PRIMARY KEY (doc_subject_relation_type)
+) ;
+
+/* document tabeli indeksid ja piirangud */
+
+CREATE   INDEX document_idx1
+ ON document
+  ( document);
+  
+CREATE   INDEX document_idx2
+ ON document
+  ( upper(doc_nr) varchar_pattern_ops);
+  
+CREATE   INDEX document_idx4
+ ON document
+  ( upper(name) varchar_pattern_ops);
+  
+CREATE   INDEX document_idx5
+ ON document
+  ( description varchar_pattern_ops);
+  
+CREATE   INDEX document_idx6
+ ON document
+  ( created);
+
+CREATE   INDEX document_idx7
+ ON document
+  ( created_by);
+  
+CREATE   INDEX document_idx8
+ ON document
+  ( updated);
+
+CREATE   INDEX document_idx9
+ ON document
+  ( updated_by);
+  
+CREATE   INDEX document_idx10
+ ON document
+  ( doc_status_type_fk);  
+
+CREATE   INDEX document_idx11
+ ON document
+  ( upper(filename) varchar_pattern_ops);
+  
+/* doc_catalog tabeli indeksid ja piirangud */
+
+CREATE   INDEX doc_catalog_idx1
+ ON doc_catalog
+  ( doc_catalog);
+  
+CREATE   INDEX doc_catalog_idx2
+ ON doc_catalog
+  ( upper(name) varchar_pattern_ops);
+
+CREATE   INDEX doc_catalog_idx3
+ ON doc_catalog
+  ( upper(description) varchar_pattern_ops);
+  
+CREATE   INDEX doc_catalog_idx4
+ ON doc_catalog
+  ( upper_catalog_fk);
+  
+CREATE   INDEX doc_catalog_idx5
+ ON doc_catalog
+  ( catalog_owner_fk );
+  
+CREATE   INDEX doc_catalog_idx6
+ ON doc_catalog
+  ( content_updated );
+  
+CREATE   INDEX doc_catalog_idx7
+ ON doc_catalog
+  ( content_updated_by );
+
+CREATE   INDEX doc_catalog_idx8
+ ON doc_catalog
+  ( upper(folder) varchar_pattern_ops);
+  
+ /* doc_status tabeli indeksid ja piirangud */
+
+CREATE   INDEX doc_status_idx1
+ ON doc_status
+  ( doc_status);
+  
+CREATE   INDEX doc_status_idx2
+ ON doc_status
+  ( document_fk);
+  
+CREATE   INDEX doc_status_idx3
+ ON doc_status
+  ( doc_status_type_fk);
+  
+CREATE   INDEX doc_status_idx4
+ ON doc_status
+  ( created_by);
+  
+CREATE   INDEX doc_status_idx5
+ ON doc_status
+  ( status_begin);
+
+CREATE   INDEX doc_status_idx6
+ ON doc_status
+  ( status_end);
+    
+  
+/* doc_attribute tabeli indeksid ja piirangud */
+
+CREATE   INDEX doc_attribute_idx1
+ ON doc_attribute
+  ( doc_attribute);
+
+CREATE   INDEX doc_attribute_idx2
+ ON doc_attribute
+  ( document_fk);
+
+CREATE   INDEX doc_attribute_idx3
+ ON doc_attribute
+  ( doc_attribute_type_fk);
+
+CREATE   INDEX doc_attribute_idx4
+ ON doc_attribute
+  ( atr_type_selection_value_fk);
+
+CREATE   INDEX doc_attribute_idx5
+ ON doc_attribute
+  ( upper(type_name) varchar_pattern_ops);
+  
+CREATE   INDEX doc_attribute_idx6
+ ON doc_attribute
+  ( upper(value_text) varchar_pattern_ops);
+
+CREATE   INDEX doc_attribute_idx7
+ ON doc_attribute
+  ( value_number,data_type);
+  
+CREATE   INDEX doc_attribute_idx8
+ ON doc_attribute
+  ( value_date,data_type);
+  
+/* doc_attribute_type tabeli indeksid ja piirangud */
+
+CREATE   INDEX doc_attribute_type_idx1
+ ON doc_attribute_type
+  ( doc_attribute_type);  
+
+CREATE   INDEX doc_attribute_type_idx2
+ ON doc_attribute_type
+  ( upper(type_name) varchar_pattern_ops);  
+  
+  
+/* doc_type tabeli indeksid ja piirangud */
+
+CREATE   INDEX doc_type_idx1
+ ON doc_type
+  ( doc_type);  
+
+CREATE   INDEX doc_type_idx2
+ ON doc_type
+  ( type_name varchar_pattern_ops);  
+  
+CREATE   INDEX doc_type_idx3
+ ON doc_type
+  ( super_type_fk);  
+
+/* doc_type_attribute tabeli indeksid ja piirangud */
+
+CREATE   INDEX doc_type_attribute_idx1
+ ON doc_type_attribute
+  ( doc_type_attribute);  
+  
+CREATE   INDEX doc_type_attribute_idx2
+ ON doc_type_attribute
+  ( doc_attribute_type_fk);  
+  
+CREATE   INDEX doc_type_attribute_idx3
+ ON doc_type_attribute
+  ( doc_type_fk);  
+  
+/* atr_type_selection_value tabeli indeksid ja piirangud */
+
+CREATE   INDEX atr_type_selection_value_idx1
+ ON atr_type_selection_value
+  ( atr_type_selection_value);   
+
+CREATE   INDEX atr_type_selection_value_idx2
+ ON atr_type_selection_value
+  ( doc_attribute_type_fk); 
+  
+/* document_doc_type tabeli indeksid ja piirangud */
+
+CREATE   INDEX document_doc_type_idx1
+ ON document_doc_type
+  ( document_doc_type);  
+  
+CREATE   INDEX document_doc_type_idx2
+ ON document_doc_type
+  ( doc_type_fk);  
+  
+CREATE   INDEX document_doc_type_idx3
+ ON document_doc_type
+  ( document_fk); 
+
+/* document_doc_catalog tabeli indeksid ja piirangud */
+
+CREATE   INDEX document_doc_catalog_idx1
+ ON document_doc_catalog
+  ( document_doc_catalog);  
+  
+CREATE   INDEX document_doc_catalog_idx2
+ ON document_doc_catalog
+  ( document_fk);  
+  
+CREATE   INDEX document_doc_catalog_idx3
+ ON document_doc_catalog
+  ( doc_catalog_fk);    
+  
+  
+/* doc_subject tabeli indeksid ja piirangud */
+
+CREATE   INDEX doc_subject_idx1
+ ON doc_subject
+  ( doc_subject); 
+  
+CREATE   INDEX doc_subject_idx2
+ ON doc_subject
+  (subject_fk); 
+  
+CREATE   INDEX doc_subject_idx3
+ ON doc_subject
+  (subject_fk,doc_subject_type_fk); 
+  
+  
+  

@@ -1,0 +1,227 @@
+/* Klassifikaatorite sisestamine: tyybid, liigid jms. */
+
+INSERT INTO ent_per_relation_type (ent_per_relation_type, type_name) VALUES (1,'ettevotte esindaja');
+INSERT INTO ent_per_relation_type (ent_per_relation_type, type_name) VALUES (2,'sekretar');
+INSERT INTO ent_per_relation_type (ent_per_relation_type, type_name) VALUES (3,'myygiesindaja');
+INSERT INTO ent_per_relation_type (ent_per_relation_type, type_name) VALUES (4,'juhatuse liige');
+INSERT INTO ent_per_relation_type (ent_per_relation_type, type_name) VALUES (5,'direktor');
+
+INSERT INTO contact_type (contact_type, type_name) VALUES (1,'e_mail');
+INSERT INTO contact_type (contact_type, type_name) VALUES (2,'telefon');
+
+INSERT INTO address_type (address_type, type_name) VALUES (1,'po-hiaadress');
+INSERT INTO address_type (address_type, type_name) VALUES (2,'lisaaadress');
+INSERT INTO address_type (address_type, type_name) VALUES (3,'ettevo-tte juriidiline aadress');
+
+
+INSERT INTO employee_role_type (employee_role_type, type_name) VALUES (1,'laotootaja');
+INSERT INTO employee_role_type (employee_role_type, type_name) VALUES (2,'remonditellimuste vastvotja');
+INSERT INTO employee_role_type (employee_role_type, type_name) VALUES (3,'dokumendihaldur');
+INSERT INTO employee_role_type (employee_role_type, type_name) VALUES (4,'kliendihaldur');
+
+INSERT INTO subject_type (subject_type, type_name) VALUES (1,'isik');
+INSERT INTO subject_type (subject_type, type_name) VALUES (2,'ettevote');
+INSERT INTO subject_type (subject_type, type_name) VALUES (3,'tootaja');
+INSERT INTO subject_type (subject_type, type_name) VALUES (4,'klient');
+
+/* sisetame yhe ettevo-tte - selles ettevo-ttes hakkavad toojajad to"o"le (vt. allpool) */
+INSERT INTO enterprise (name,full_name, created) VALUES ('Yhendatud Systeemid','Oy yhendatud Systeemid Ltd', NOW());
+
+/* lisame moned isikud koos aadresside ja kontaktidega person tabelisse, nendest isikutest saavad tootajad (employee) ettevottes Yhendatud Systeemid */
+
+INSERT INTO person (first_name, last_name, identity_code, birth_date, created) VALUES ('Juhan','Juurikas','54637474','11.11.1967',NOW());
+INSERT INTO employee (person_fk,enterprise_fk, active) VALUES (1,1,'Y');
+/* lisame nyyd isikule pohiaadressi, subject_fk viitab tabelile person, subject_type_fk sellele et tegemist on isiku (mitte ettevotte) */
+/* aadressiga   */
+INSERT INTO address (address_type_fk, subject_fk,subject_type_fk, country,county, town_village, street_address,zipcode) 
+VALUES (1,1,1,'Eesti','Harju','Tallinn','Liivalaia 34A-11','5262633');
+
+/* lisame sellele ylemisele isikule/tootajale veel paar lisa-aadressi, address_type_fk viitab nyyd lisa-aadressi tyybile */
+INSERT INTO address (address_type_fk, subject_fk,subject_type_fk, country,county, town_village, street_address,zipcode) 
+VALUES (2,1,1,'Eesti','Tartu','Tartu','Kuuse 111','434443');
+INSERT INTO address (address_type_fk, subject_fk,subject_type_fk, country,county, town_village, street_address,zipcode) 
+VALUES (2,1,1,'Rootsi','Stockholm','Vaxholm','Gustav Vasa 45','5647474');
+
+/* lisame kontakte ka. kontaktid lisame isikule (subject_type_fk=1, subject_fk viitab tabelisse person) */
+INSERT INTO contact (subject_type_fk,subject_fk,contact_type_fk,value_text,orderby) VALUES (1,1,1,'juhan@juurikas.ee',1);
+INSERT INTO contact (subject_type_fk,subject_fk,contact_type_fk,value_text,orderby) VALUES (1,1,1,'juhan333@hotmail.com',2);
+INSERT INTO contact (subject_type_fk,subject_fk,contact_type_fk,value_text,orderby) VALUES (1,1,2,'+372 829392',1);
+INSERT INTO contact (subject_type_fk,subject_fk,contact_type_fk,value_text,orderby) VALUES (1,1,2,'+372 945352',2);
+
+/* anname tootajale dokumendihalduri ja remonditellimuste vastuvotja rollid */
+INSERT INTO employee_role (employee_fk,employee_role_type_fk,active) VALUES (1,3,'Y');
+INSERT INTO employee_role (employee_fk,employee_role_type_fk,active) VALUES (1,2,'Y');
+
+/* lisame tootajale konto tabelisse user_account. parool on krypteeritud md5-ga */
+/* parooliks on string "juurikas34metsX" */
+/* subject_type_fk = 3 mis tahendab et subject_fk viitab tabelisse employee */
+INSERT INTO user_account (subject_type_fk, subject_fk,username, passw,status) VALUES (3,1,'juhan','c3833e23112f86f172ab150a50526843',1);
+
+/* lisame veel 2 isikut tabelise person , teeme nad tootajateks (employee) ja anname aadressid ja kontaktid */
+/* MARTEN MAASIKAS */
+INSERT INTO person (first_name, last_name, identity_code, birth_date, created) VALUES ('Marten','Maasikas','672727337XX','11.11.1977',NOW());
+INSERT INTO employee (person_fk,enterprise_fk, active) VALUES (2,1,'Y');
+INSERT INTO address (address_type_fk, subject_fk,subject_type_fk, country,county, town_village, street_address,zipcode) 
+VALUES (1,2,1,'Eesti','Harju','Tallinn','Tartu mnt. 67','123333');
+
+INSERT INTO address (address_type_fk, subject_fk,subject_type_fk, country,county, town_village, street_address,zipcode) 
+VALUES (2,2,1,'Eesti','Valgamaa','Valga','Tamme 55','1111');
+INSERT INTO address (address_type_fk, subject_fk,subject_type_fk, country,county, town_village, street_address,zipcode) 
+VALUES (2,2,1,'Eesti','Parnu','Parnu','Tuule 5','6677272');
+
+INSERT INTO contact (subject_type_fk,subject_fk,contact_type_fk,value_text,orderby) VALUES (1,2,1,'marten.maasikas@yhendatudsysteemid.ee',1);
+INSERT INTO contact (subject_type_fk,subject_fk,contact_type_fk,value_text,orderby) VALUES (1,2,1,'marten14@hotmail.com',2);
+INSERT INTO contact (subject_type_fk,subject_fk,contact_type_fk,value_text,orderby) VALUES (1,2,2,'+372 67272',1);
+INSERT INTO contact (subject_type_fk,subject_fk,contact_type_fk,value_text,orderby) VALUES (1,2,2,'+372 19203',2);
+
+/* anname tootajale  remonditellimuste vastuvotja rolli */
+INSERT INTO employee_role (employee_fk,employee_role_type_fk,active) VALUES (2,2,'Y');
+
+/* parooliks on string "Kaal98UjVbcx1" */
+INSERT INTO user_account (subject_type_fk, subject_fk,username, passw,status) VALUES (3,2,'marten','37b4931088193a73b6561bae19bf06d9',1);
+
+/* TANEL TUISK */
+INSERT INTO person (first_name, last_name, identity_code, birth_date, created) VALUES ('Tanel','Tuisk','672727337XX','11.11.1980',NOW());
+INSERT INTO employee (person_fk,enterprise_fk, active) VALUES (3,1,'Y');
+INSERT INTO address (address_type_fk, subject_fk,subject_type_fk, country,county, town_village, street_address,zipcode) 
+VALUES (1,3,1,'Eesti','Harju','Tallinn','Narva mnt. 67','4545656');
+
+INSERT INTO address (address_type_fk, subject_fk,subject_type_fk, country,county, town_village, street_address,zipcode) 
+VALUES (2,3,1,'Eesti','Valgamaa','Valga','Traktori 55','78382');
+INSERT INTO address (address_type_fk, subject_fk,subject_type_fk, country,county, town_village, street_address,zipcode) 
+VALUES (2,3,1,'Eesti','Parnu','Parnu','Kuuse 5','6677272');
+
+INSERT INTO contact (subject_type_fk,subject_fk,contact_type_fk,value_text,orderby) VALUES (1,3,1,'tanel.tuisk@yhendatudsysteemid.ee',1);
+INSERT INTO contact (subject_type_fk,subject_fk,contact_type_fk,value_text,orderby) VALUES (1,3,1,'tanel4r@hotmail.com',2);
+INSERT INTO contact (subject_type_fk,subject_fk,contact_type_fk,value_text,orderby) VALUES (1,3,2,'+372 67272',1);
+INSERT INTO contact (subject_type_fk,subject_fk,contact_type_fk,value_text,orderby) VALUES (1,3,2,'+372 19203',2);
+
+/* anname tootajale  remonditellimuste vastuvotja rolli */
+INSERT INTO employee_role (employee_fk,employee_role_type_fk,active) VALUES (3,2,'Y');
+
+
+/* parooliks on string "Hjn7uJ67Cv2" */
+INSERT INTO user_account (subject_type_fk, subject_fk,username, passw,status) VALUES (3,3,'tanel','4579f13a9f0266d03218017ebe4e67c7',1);
+
+
+/* CUSTOMER: Lisame neljanda ja viienda isiku - nendest isikutest teeme kliendid (lisaks kirje tabelisse customer) */
+/* KAAREL KLIENT */
+INSERT INTO person (first_name, last_name, identity_code, birth_date, created) VALUES ('Kaarel','Klient','5555555555XXXX','11.11.1970',NOW());
+INSERT INTO customer (subject_fk,subject_type_fk) VALUES (4,1);
+INSERT INTO address (address_type_fk, subject_fk,subject_type_fk, country,county, town_village, street_address,zipcode) 
+VALUES (1,4,1,'Eesti','Harju','Tallinn','Akadeemia 21','6663363');
+
+INSERT INTO address (address_type_fk, subject_fk,subject_type_fk, country,county, town_village, street_address,zipcode) 
+VALUES (2,4,1,'Eesti','Valgamaa','Valga','Lennuki 55','78382');
+INSERT INTO address (address_type_fk, subject_fk,subject_type_fk, country,county, town_village, street_address,zipcode) 
+VALUES (2,4,1,'Eesti','Parnu','Parnu','Mereranna 95','1112222');
+
+INSERT INTO contact (subject_type_fk,subject_fk,contact_type_fk,value_text,orderby) VALUES (1,4,1,'kaarel.klient@klient.ee',1);
+INSERT INTO contact (subject_type_fk,subject_fk,contact_type_fk,value_text,orderby) VALUES (1,4,1,'kaarel@hotmail.com',2);
+INSERT INTO contact (subject_type_fk,subject_fk,contact_type_fk,value_text,orderby) VALUES (1,4,2,'+372 5352',1);
+INSERT INTO contact (subject_type_fk,subject_fk,contact_type_fk,value_text,orderby) VALUES (1,4,2,'+372 2323',2);
+
+/* ANNA ARU */
+INSERT INTO person (first_name, last_name, identity_code, birth_date, created) VALUES ('Anna','Aru','57838222','11.11.1975',NOW());
+INSERT INTO customer (subject_fk,subject_type_fk) VALUES (5,1);
+INSERT INTO address (address_type_fk, subject_fk,subject_type_fk, country,county, town_village, street_address,zipcode) 
+VALUES (1,5,1,'Eesti','Harju','Tallinn','Akadeemia 21','6663363');
+
+INSERT INTO address (address_type_fk, subject_fk,subject_type_fk, country,county, town_village, street_address,zipcode) 
+VALUES (2,5,1,'Eesti','Valgamaa','Valga','Rongi 55','78382');
+INSERT INTO address (address_type_fk, subject_fk,subject_type_fk, country,county, town_village, street_address,zipcode) 
+VALUES (2,5,1,'Eesti','Parnu','Parnu','Pilvekese 95','1112222');
+
+INSERT INTO contact (subject_type_fk,subject_fk,contact_type_fk,value_text,orderby) VALUES (1,5,1,'anna.aru@klient.ee',1);
+INSERT INTO contact (subject_type_fk,subject_fk,contact_type_fk,value_text,orderby) VALUES (1,5,1,'annaaru@hotmail.com',2);
+INSERT INTO contact (subject_type_fk,subject_fk,contact_type_fk,value_text,orderby) VALUES (1,5,2,'+372 5352',1);
+INSERT INTO contact (subject_type_fk,subject_fk,contact_type_fk,value_text,orderby) VALUES (1,5,2,'+372 2323',2);
+
+/* Lisame ettevotte, ettevottele aadressi ja isiku ja seome selle isiku ettevottega kui selle ettevotte myygiesindaja */
+INSERT INTO enterprise (name,full_name, created) VALUES ('Torupood','Torupood OY', NOW());
+/* teeme ettevottest kliendi. kliendi tyybiks (subject_type_fk=2) on seekord 'ettevote', subject_fk=2 viitab ettevottele tabelis enterprise */
+INSERT INTO customer (subject_fk,subject_type_fk) VALUES (2,2);
+/* aadressi tyybiks on juriidiline aadress ja subjekti tyybiks on 2 (ettevote). Ettevotte id-ks enteprise tabelis on 2 */
+/* (teine ettevote mida sisestatakse) */
+INSERT INTO address (address_type_fk, subject_fk,subject_type_fk, country,county, town_village, street_address,zipcode) 
+VALUES (3,2,2,'Eesti','Harju','Tallinn','Akadeemia 21A','6663363');
+/* paneme yhe lisa-aadressi ka */
+INSERT INTO address (address_type_fk, subject_fk,subject_type_fk, country,county, town_village, street_address,zipcode) 
+VALUES (2,2,2,'Eesti','Parnu','Parnu','Torukese 95','1112222');
+/* lisame ettevottele yld-telefoni kontaktidesse */
+INSERT INTO contact (subject_type_fk,subject_fk,contact_type_fk,value_text,orderby,note) VALUES (2,2,2,'+372 2323',1,'infotelefon');
+
+/* nyyd lisame ettevotte esindaja tabelisse person ja seome ta ettevottega 2 */
+
+INSERT INTO person (first_name, last_name, identity_code, birth_date, created) VALUES ('Tauno','Toru','672727337XX','11.11.1977',NOW());
+/* ent_per_relation_type_fk=3 (myygiesindaja), person_fk=6 (jarjekorras kuues isik mida person tabelisse sisestame), enterprise_fk=2 (Torupood) */
+INSERT INTO enterprise_person_relation (ent_per_relation_type_fk,person_fk,enterprise_fk) VALUES (3,6,2);
+/* lisame myygiesindajale tema enda personaalse kontakttelefoni ka */
+INSERT INTO contact (subject_type_fk,subject_fk,contact_type_fk,value_text,orderby,note) VALUES (1,6,2,'+372 2323',1,'tootelefon');
+
+/* teeme moned atribuudi tyybid ettevotte andmete jaoks. data_type=1 - see tahendab et vaartus on text-tyypi ja   */
+/* sisestatakse subject_attribute tabelis valjale [value_text] */
+/* multiple_attributes='Y' - see tahendab et tegevusalasid (tegevusala atribuute) voib olla mitu */
+/* subject_type_fk=2 - see tahendab et need atribuudid tyybid kuuluvad ettevotete andmete sisestamise juurde */
+INSERT INTO subject_attribute_type (subject_type_fk,type_name,data_type,multiple_attributes,orderby,required) VALUES (2,'tegevusalad',1,'Y',1,'N');
+/* data_type=2 - see tahendab et vaartus on number-tyypi ja sisestatakse subject_attribute tabelis valjale [value_number] */
+INSERT INTO subject_attribute_type (subject_type_fk,type_name,data_type,multiple_attributes,orderby,required) VALUES (2,'asutamise aasta',2,'N',2,'N');
+
+/* lisame eraisikute  konfigureerimiseks ka yhe atribuudi tyybi */
+/* vaartus sisestatakse subject_attribute tabelis valjale [value_text] (kas on Eesti elanik voi mitte , "jah/ei") */
+INSERT INTO subject_attribute_type (subject_type_fk,type_name,data_type,multiple_attributes,orderby,required) VALUES (1,'Eesti resident',1,'N',1,'N');
+
+/* lisame employee  konfigureerimiseks ka yhe atribuudi tyybi */
+/* vaartus sisestatakse subject_attribute tabelis valjale [value_number]  */
+INSERT INTO subject_attribute_type (subject_type_fk,type_name,data_type,multiple_attributes,orderby,required) VALUES (2,'laste arv',2,'N',2,'N');
+
+/* lisame customeri  konfigureerimiseks ka kaks atribuudi tyypi - huvialad ja allahindluse protsendi */
+/* vaartus sisestatakse subject_attribute tabelis valjale [value_number]  */
+INSERT INTO subject_attribute_type (subject_type_fk,type_name,data_type,multiple_attributes,orderby,required) VALUES (4,'kliendi huvialad',1,'N',1,'N');
+INSERT INTO subject_attribute_type (subject_type_fk,type_name,data_type,multiple_attributes,orderby,required) VALUES (4,'allahindluse %',2,'N',2,'N');
+/* lisame ettevottele Torupood asutamise aasta ja kaks tegevusala */
+
+INSERT INTO subject_attribute (subject_fk,subject_attribute_type_fk,subject_type_fk, value_number,data_type,orderby) VALUES (2,2,2,1998,2,1);
+INSERT INTO subject_attribute (subject_fk,subject_attribute_type_fk,subject_type_fk, value_text,data_type,orderby) VALUES (2,1,2,'torutood',1,2);
+INSERT INTO subject_attribute (subject_fk,subject_attribute_type_fk,subject_type_fk, value_text,data_type,orderby) VALUES (2,1,2,'kanalisatsioonitood',1,3);
+
+/* lisame isikule 1 (Juhan Juurikas tabelis person) info selle kohta et ta elab eestis */
+INSERT INTO subject_attribute (subject_fk,subject_attribute_type_fk,subject_type_fk, value_text,data_type) VALUES (1,3,1,'jah',1);
+
+/* lisame isikule 2 (Marten Maasikas tabelis person) info selle kohta et ta elab eestis */
+INSERT INTO subject_attribute (subject_fk,subject_attribute_type_fk,subject_type_fk, value_text,data_type) VALUES (2,3,1,'jah',1);
+
+/* lisame isikule 3 (Tanel Tuisk tabelis person) info selle kohta et ta elab eestis */
+INSERT INTO subject_attribute (subject_fk,subject_attribute_type_fk,subject_type_fk, value_text,data_type) VALUES (3,3,1,'jah',1);
+
+/* lisame isikule 4 (Kaarel Klient tabelis person) info selle kohta et ta elab eestis */
+INSERT INTO subject_attribute (subject_fk,subject_attribute_type_fk,subject_type_fk, value_text,data_type) VALUES (4,3,1,'jah',1);
+
+/* lisame isikule 5 (Anna Aru tabelis person) info selle kohta et ta elab eestis */
+INSERT INTO subject_attribute (subject_fk,subject_attribute_type_fk,subject_type_fk, value_text,data_type) VALUES (5,3,1,'jah',1);
+
+/* lisame isikule 6 (Tauno Toru tabelis person) info selle kohta et ta ei ela eestis */
+INSERT INTO subject_attribute (subject_fk,subject_attribute_type_fk,subject_type_fk, value_text,data_type) VALUES (6,3,1,'ei',1);
+
+
+/* lisame tootajale 2 (Marten Maasikas tabelis employee), subject_type_fk=3 info laste arvu kohta , tal on 12 last*/
+INSERT INTO subject_attribute (subject_fk,subject_attribute_type_fk,subject_type_fk, value_number,data_type) VALUES (1,4,3,12,2);
+
+/* lisame kliendile 1 ("Kaarel Klient" tabelites person+customer) info huvialade kohta, huvitub see klient mootorratastest*/
+INSERT INTO subject_attribute (subject_fk,subject_attribute_type_fk,subject_type_fk, value_text,data_type,orderby) VALUES (1,5,4,'mootorrattad',1,1);
+/* lisame kliendile allahindluse protsendiks 10% */
+INSERT INTO subject_attribute (subject_fk,subject_attribute_type_fk,subject_type_fk, value_number,data_type,orderby) VALUES (1,6,4,10,2,2);
+
+/* lisame kliendile 2 ("Anna Aru" tabelites person+customer) info huvialade kohta, huvitub see klient lilledest*/
+INSERT INTO subject_attribute (subject_fk,subject_attribute_type_fk,subject_type_fk, value_text,data_type,orderby) VALUES (2,5,4,'lilled',1,1);
+/* lisame kliendile allahindluse protsendiks 10% */
+INSERT INTO subject_attribute (subject_fk,subject_attribute_type_fk,subject_type_fk, value_number,data_type,orderby) VALUES (2,6,4,10,2,2);
+
+/* lisame kliendile 3 ("Torupood" tabelites enteprise+customer) info huvialade kohta, huvitub see klient lilledest*/
+INSERT INTO subject_attribute (subject_fk,subject_attribute_type_fk,subject_type_fk, value_text,data_type,orderby) VALUES (3,5,4,'lilled',1,1);
+/* lisame kliendile allahindluse protsendiks 10% */
+INSERT INTO subject_attribute (subject_fk,subject_attribute_type_fk,subject_type_fk, value_number,data_type,orderby) VALUES (3,6,4,10,2,2);
+
+/* lisaks yks kasutajakonto yhe kliendi jaoks tabelisse [user_account] (seda laheb vaja ylesandes REMONDITEENUS) */
+/* subject_type_fk=4 (customer) ja subject_fk viitab tabelisse customer */
+INSERT INTO user_account (subject_type_fk, subject_fk, username, passw,status) VALUES (4,1,'kaarel','kmmm89',1);

@@ -1,0 +1,256 @@
+/* klassifikaatorid */
+INSERT INTO data_type (data_type,type_name) VALUES (1,'string');
+INSERT INTO data_type (data_type,type_name) VALUES (2,'number');
+INSERT INTO data_type (data_type,type_name) VALUES (3,'kuupaev');
+INSERT INTO data_type (data_type,type_name) VALUES (4,'valik nimekirjast');
+
+INSERT INTO doc_subject_type (doc_subject_type, type_name) VALUES (1,'isik');
+INSERT INTO doc_subject_type (doc_subject_type, type_name) VALUES (2,'ettevote');
+
+INSERT INTO doc_subject_relation_type (doc_subject_relation_type, type_name) VALUES (1,'autor');
+INSERT INTO doc_subject_relation_type (doc_subject_relation_type, type_name) VALUES (2,'tema kohta');
+INSERT INTO doc_subject_relation_type (doc_subject_relation_type, type_name) VALUES (3,'talle saadetud');
+INSERT INTO doc_subject_relation_type (doc_subject_relation_type, type_name) VALUES (4,'saatja');
+
+INSERT INTO doc_catalog_type (doc_catalog_type,type_name)
+VALUES (1,'isiklik');
+
+INSERT INTO doc_catalog_type (doc_catalog_type,type_name)
+VALUES (2,'yldine');
+
+INSERT INTO doc_status_type (doc_status_type, type_name)
+VALUES (1,'vastu voetud');
+
+
+
+INSERT INTO doc_status_type (doc_status_type, type_name)
+VALUES (2,'vastamisel');
+
+INSERT INTO doc_status_type (doc_status_type, type_name)
+VALUES (3,'kooskolastatud');
+
+INSERT INTO doc_status_type (doc_status_type, type_name)
+VALUES (4,'vastatud');
+
+
+INSERT INTO doc_status_type (doc_status_type, type_name)
+VALUES (5,'koostamisel');
+
+
+INSERT INTO doc_type (type_name, level,super_type_fk) 
+VALUES ('finantsdokument',1,0);
+
+INSERT INTO doc_type (type_name, level,super_type_fk) 
+VALUES ('leping',1,0);
+
+INSERT INTO doc_type (type_name, level,super_type_fk) 
+VALUES ('valjast saadetud',1,0);
+
+INSERT INTO doc_type (type_name, level,super_type_fk) 
+VALUES ('maaratlemata',1,0);
+
+INSERT INTO doc_type (type_name, level,super_type_fk) 
+VALUES ('arve',2,1);
+
+INSERT INTO doc_type (type_name, level,super_type_fk) 
+VALUES ('finantsaruanne',2,1);
+
+INSERT INTO doc_type (type_name, level,super_type_fk) 
+VALUES ('tarneleping',2,2);
+
+INSERT INTO doc_type (type_name, level,super_type_fk) 
+VALUES ('yyrileping',2,2);
+
+
+INSERT INTO doc_type (type_name, level,super_type_fk) 
+VALUES ('tooleping',2,2);
+
+INSERT INTO doc_type (type_name, level,super_type_fk) 
+VALUES ('teabenoue',2,3);
+
+/* lisame teabenoude dokumendi liigile moned atribuudi tyybid */
+
+INSERT INTO doc_attribute_type (type_name, data_type_fk,multiple_attributes)
+VALUES ('saatjad',1,'N');
+
+INSERT INTO doc_attribute_type (type_name, data_type_fk,default_selection_id_fk,multiple_attributes)
+VALUES ('vastamise tahtaeg',4,4,'N');
+
+INSERT INTO doc_attribute_type (type_name, data_type_fk,multiple_attributes)
+VALUES ('formaat',1,'N');
+
+INSERT INTO atr_type_selection_value (doc_attribute_type_fk, value_text,orderby)
+VALUES (2,'kahe paeva jooksul',1);
+
+INSERT INTO atr_type_selection_value (doc_attribute_type_fk, value_text,orderby)
+VALUES (2,'nadala jooksul',2);
+
+INSERT INTO atr_type_selection_value (doc_attribute_type_fk, value_text,orderby)
+VALUES (2,'kuu aja jooksul',3);
+
+INSERT INTO atr_type_selection_value (doc_attribute_type_fk, value_text,orderby)
+VALUES (2,'maaramata',4);
+
+/* seome atribuudi tyybid dokumendi tyybiga 'teabenoue' */
+/* doc_type_fk=9 (teabenoue), doc_attribute_type-fk=1 (saatjad), created_by_deafult='Y' */
+/* (see tahendab et seda tyypi atribuut (doc_attribute_type_fk-tyypi) tuleb sisestada andmebaasi */
+/* kohe kui tabelisse DOCUMENT sisestatakse uus seda tyypi (doc_type_fk) atribuut. */
+/* required='N' tahendab et kasutaja ei pea ekraanivormil taitma atribuudi vaartust (mis laheb valja value_text) */
+/* selle andmetyybiga atribuudi puhul (doc_attribute_type_fk=1 korral on data_type=1 ehk "string") */
+
+
+INSERT INTO doc_type_attribute (doc_type_fk, doc_attribute_type_fk,created_by_default, orderby,required)
+VALUES (10,1,'Y',1,'N');
+
+/*  doc_attribute_type-fk=2 (vastamise tahtaeg) */
+INSERT INTO doc_type_attribute (doc_type_fk, doc_attribute_type_fk,created_by_default, orderby,required)
+VALUES (10,2,'Y',2,'Y');
+
+/*  doc_attribute_type-fk=3 (dokumendi formaadi kohta mingid tapsemad andmed) */
+INSERT INTO doc_type_attribute (doc_type_fk, doc_attribute_type_fk,created_by_default, orderby,required)
+VALUES (10,3,'Y',3,'N');
+
+/* sisestame moned dokumendi kataloogid */
+
+INSERT INTO doc_catalog (name,level,upper_catalog_fk,doc_catalog_type_fk,folder)
+VALUES ('sisse tulnud',1,0,2,'/home/t567245/doc_root/1');
+
+INSERT INTO doc_catalog (name,level,upper_catalog_fk,doc_catalog_type_fk,folder)
+VALUES ('teated',1,0,2,'/home/t567245/doc_root/2');
+
+INSERT INTO doc_catalog (name,level,upper_catalog_fk,doc_catalog_type_fk,folder)
+VALUES ('toojuhendid',1,0,2,'/home/t567245/doc_root/3');
+
+INSERT INTO doc_catalog (name,level,upper_catalog_fk,doc_catalog_type_fk,folder)
+VALUES ('teabenouded',2,1,2,'/home/t567245/doc_root/1/1');
+
+INSERT INTO doc_catalog (name,level,upper_catalog_fk,doc_catalog_type_fk,folder)
+VALUES ('teated synnipaevadest',2,2,2,'/home/t567245/doc_root/2/1');
+
+INSERT INTO doc_catalog (name,level,upper_catalog_fk,doc_catalog_type_fk,folder)
+VALUES ('puhkusegraafikud',2,2,2,'/home/t567245/doc_root/2/2');
+
+INSERT INTO doc_catalog (name,level,upper_catalog_fk,doc_catalog_type_fk,folder)
+VALUES ('teated tooaja muudatustest',2,2,2,'/home/t567245/doc_root/2/3');
+
+/* sisestame dokumendi - yhe teabenoude mille atribuutid sisaldavad andmeid saatjate kohta (text-vali) ja */
+/* vastamise tahtaegade kohta (valiku-list) */
+
+/* created_by=1 - viit tabelisse SUBJEKT.employee */
+/* doc_status_type_fk=1 'vastu voetud' */
+INSERT INTO document (name,description, created, created_by, doc_status_type_fk)
+VALUES ('Juhan Metsa teabenoue elektriliini asjus','Tahab teada miks elektriliin jookseb tema krundilt labi',NOW(),1,1);
+
+/* seome dokumendi dokumendi tyybiga (kasutaja teeb seda dokumendi sisestamisel) */
+INSERT INTO document_doc_type (doc_type_fk, document_fk) VALUES (10,1);
+
+/* sellise tyybi korral tuleb nyyd lugeda tabelitest doc_type_attribute ja doc_attribute_type */
+/* mis tyypi atribuudid tuleb kohe lisada dokumendile tabelisse doc_attribute (doc_type_attribute.created_by_default='Y') */
+
+SELECT DAT.doc_attribute_type, DAT.type_name, DTA.orderby, DTA.required,DTA.created_by_default,DAT.default_selection_id_fk AS valiku_id, DAT.data_type_fk FROM doc_attribute_type DAT
+INNER JOIN doc_type_attribute DTA ON DAT.doc_attribute_type=DTA.doc_attribute_type_fk WHERE DTA.doc_type_fk=10;
+
+/* doc_attribute_type |     type_name     | orderby | required | created_by_default |  data_type_fk | valiku_id |   */
+/*--------------------+-------------------+---------+----------+--------------------+-------------------------------*/
+/*                  1 | saatjad           |       1  | N       | Y                  |     1                         */
+/*                  2 | vastamise tahtaeg |       2  | Y       | Y                  |     4         |     4         */
+/*                  2 | formaat           |       3  | N       | Y                  |     1         |               */
+/* sisestame ylemisest SELECT-ist saadud info alusel dokumendile tema tyybile (10) vastavad atribuudid) */
+
+INSERT INTO doc_attribute (document_fk,doc_attribute_type_fk,type_name,value_text,data_type,required,orderby) 
+VALUES (1,1,'saatjad',NULL,1,'N',1);
+
+/* atr_type_selection_value_fk=4 (SELECT-i tulemusest "valiku_id", viitab tabelisse atr_type_selection_value */
+/* selle atribuudi vaartused valitakse tabelist atr_type_selection_value ja valja "atr_type_selection_value_fk" */
+/* salvestatakse valiku id */
+INSERT INTO doc_attribute (document_fk,doc_attribute_type_fk,type_name,atr_type_selection_value_fk,data_type,required,orderby) 
+VALUES (1,2,'vastamise tahtaeg',4,4,'Y',2);
+
+/* rakendus peab nyyd ekraanivormil andma selle atribuudi vaartusi valida */
+SELECT ATSV.atr_type_selection_value, ATSV.value_text FROM atr_type_selection_value ATSV WHERE ATSV.doc_attribute_type_fk=2 ORDER BY ATSV.orderby;
+
+/* atr_type_selection_value |     value_text       */
+/*--------------------------+--------------------  */
+/*                        5 | kahe paeva jooksul   */
+/*                        6 | nadala jooksul       */
+/*                        7 | kuu aja jooksul      */
+/*                        8 | maaramata            */
+
+INSERT INTO doc_attribute (document_fk,doc_attribute_type_fk,type_name,value_text,data_type,required,orderby) 
+VALUES (1,3,'formaat',NULL,1,'N',3);
+	
+/* paneme dokumendi kataloogi 4 (teabenouded) */
+
+INSERT INTO document_doc_catalog (doc_catalog_fk,document_fk,catalog_time)
+VALUES (4,1,NOW());
+
+/* seome dokumendi tema saatjaga, saatjaks on klient SUBJEKTI skeemist, kliendi andmed on tabelis person, */
+/* samas peab selle person-iga olema seotud ka kirje tabelis customer , otsime yhe sellise */
+SELECT C.customer, P.first_name,P.last_name FROM customer C INNER JOIN person P ON  C.subject_fk=P.person WHERE C.subject_type_fk=1 AND P.last_name LIKE 'Ar%';
+
+/* customer | first_name | last_name   */
+/* ----------+------------+----------- */
+/*        2 | Anna       | Aru         */
+
+/* seome dokumendi customer nr. 2-ga */
+
+INSERT INTO doc_subject (doc_subject_type_fk, subject_fk,doc_subject_relation_type_fk,note)
+VALUES (1,2,4,'tahab kiiresti vastust');
+
+/* oletame et kasutaja muudab dokumendi staatust ekraanivormil */
+UPDATE document SET doc_status_type_fk=2,updated=NOW() WHERE document=1 ;
+/* rakendus (voi andmebaasi triger) peab  staatuse panema tabelisse doc_status */
+/* tuleb uuendada ka vana dokumendi staatust - tuleb salvestada selle staatuse lopp */
+/* eeldame et on 100% kindel - viimasel dokumendi staatusel tabelis [doc_status] status_end = NULL */
+UPDATE doc_status SET status_end=NOW() WHERE document_fk=1 AND status_end IS NULL ;
+INSERT INTO doc_status (document_fk,doc_status_type_fk,status_begin)
+VALUES (1,1,NOW());
+
+/* oletame et kasutaja  muudab UUESTI  dokumendi staatust ekraanivormil */
+UPDATE document SET doc_status_type_fk=3,updated=NOW() WHERE document=1 ;
+/* rakendus (voi andmebaasi triger) peab vana staatuse panema tabelisse doc_status */
+UPDATE doc_status SET status_end=NOW() WHERE document_fk=1 AND status_end IS NULL ;
+INSERT INTO doc_status (document_fk,doc_status_type_fk,status_begin)
+VALUES (1,2,NOW());
+
+/* oletame et kasutaja muudab dokumendi andmeid vormil ja sisestab atribuudi "saatjad" tekstivalja vaartuse */
+UPDATE doc_attribute SET value_text='Aleksander Kaseke, Voldemar Kiik' WHERE doc_attribute=1;
+
+/*  paneme teise dokumendi. */
+INSERT INTO document (name,description, created, created_by, doc_status_type_fk)
+VALUES ('2011 aasta puhkusegraafik','puhkused 2011',NOW(),1,3);
+
+/* seome dokumendi dokumendi tyybiga (kasutaja teeb seda dokumendi sisestamisel) */
+/* doc_type_fk=4 ('maaratlemata') */
+INSERT INTO document_doc_type (doc_type_fk, document_fk) VALUES (4,2);
+
+/* sellise tyybi korral tuleb nyyd lugeda tabelitest doc_type_attribute ja doc_attribute_type */	
+SELECT DAT.doc_attribute_type, DAT.type_name, DTA.orderby, DTA.required,DTA.created_by_default,DAT.default_selection_id_fk AS valiku_id, DAT.data_type_fk FROM doc_attribute_type DAT
+INNER JOIN doc_type_attribute DTA ON DAT.doc_attribute_type=DTA.doc_attribute_type_fk WHERE DTA.doc_type_fk=4;	
+
+/* sellele dokumendityybiga ei ole seotud yhtegi atribuudi tyypi, seega selel dokumendi lisamisel ei */
+/* pea lisama tabelisse doc_attribute yhtegi kirjet */
+
+
+/* paneme dokumendi kataloogi 6 (puhkusegraafikud) */
+
+INSERT INTO document_doc_catalog (doc_catalog_fk,document_fk,catalog_time)
+VALUES (6,2,NOW());
+
+/* seome dokumendi ettevottega, oletame et see dokument on antud ettevotte kohta (on selle ettevottega kuidagi */
+/* seotud), ettevote on parit SUBJEKTI skeemist, ettevotte andmed on tabelis enterprise, */
+/* Otsime yhe ettevote mille aadress algab nimega "Akadeemia" */
+
+SELECT E.enterprise,E.name FROM enterprise E LEFT JOIN address A ON E.enterprise = A.subject_fk INNER JOIN address_type AT ON A.address_type_fk = AT.address_type
+WHERE A.subject_type_fk = 2 AND A.street_address LIKE 'Akadeemia%' ;
+
+/* enterprise |   name    */
+/*------------+---------- */
+/*          2 | Torupood  */
+
+/* doc_subject_type_fk=2 (ettevote), subject_fk=2 (enterpise-valja vaartis paringu tulemusest) */
+/* doc_subject_relation_type_fk=2 ("tema kohta") */
+INSERT INTO doc_subject (doc_subject_type_fk, subject_fk,doc_subject_relation_type_fk,note)
+VALUES (2,2,2,'artikkel selle ettevotte kohta');
+		  
+

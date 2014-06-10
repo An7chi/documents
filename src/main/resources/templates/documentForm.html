@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/head :: head">
+    <meta charset="UTF-8"/>
+    <title>Document Form</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css"/>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker3.min.css"/>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.min.js"></script>
+    <script>
+        $('.datepicker').datepicker({
+            format: "yyyy-mm-dd",
+            weekStart: 1,
+            todayBtn: "linked"
+        });
+    </script>
+</head>
+<body>
+<div class="container">
+
+    <div th:include="fragments/bodyHeader :: bodyHeader" th:remove="tag"></div>
+
+    <h1>Document</h1>
+
+    <form action="#" th:action="@{|/document/save|}" th:object="${document}" method="POST" class="form-horizontal" role="form" accept-charset="UTF-8">
+
+        <div class="alert alert-danger" th:if="${#fields.hasErrors('*')}">
+            <p th:each="error : ${#fields.errors('*')}" th:text="${error}"></p>
+        </div>
+
+        <input type="hidden" name="id" id="inputDocument" th:value="*{id}"/>
+
+        <div class="form-group" th:classappend="${#fields.hasErrors('name')} ? 'has-error'">
+            <label for="inputName" class="col-sm-2 control-label">Name (required)</label>
+
+            <div class="col-sm-10">
+                <input th:field="*{name}" type="text" class="form-control" id="inputName" placeholder="Name"/>
+                <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="help-block">Name Error</span>
+            </div>
+        </div>
+
+        <div class="form-group" th:classappend="${#fields.hasErrors('description')} ? 'has-error'">
+            <label for="inputDescription" class="col-sm-2 control-label">Description (required)</label>
+
+            <div class="col-sm-10">
+                <textarea th:field="*{description}" class="form-control" rows="3" id="inputDescription" placeholder="Description"></textarea>
+                <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="help-block">Description Error</span>
+            </div>
+        </div>
+
+        <div class="form-group" th:each="docAttribute, stat : *{docAttributes}" th:classappend="${#fields.hasErrors('docAttributes[__${stat.index}__]')} ? 'has-error'">
+            <label for="inputAttribute1" th:for="'inputAttribute' + ${stat.index}"
+                   th:text="${docAttribute.typeName} + (${docAttribute.required} ? ' (required)' : '')"
+                   class="col-sm-2 control-label">docAttribute.name</label>
+
+            <div class="col-sm-10">
+                <input th:if="${#strings.toString(docAttribute.dataType) == 'STRING'}" th:field="*{docAttributes[__${stat.index}__].valueText}" type="text"
+                       class="form-control" th:id="'inputAttribute' + ${stat.index}" id="inputAttribute1"/>
+                <input th:if="${#strings.toString(docAttribute.dataType) == 'NUMBER'}" th:field="*{docAttributes[__${stat.index}__].valueNumber}" type="number"
+                       class="form-control" th:id="'inputAttribute' + ${stat.index}" id="inputAttribute2"/>
+                <input th:if="${#strings.toString(docAttribute.dataType) == 'DATE'}" th:field="*{docAttributes[__${stat.index}__].valueNumber}" type="date"
+                       class="form-control datepicker" th:id="'inputAttribute' + ${stat.index}" id="inputAttribute3"/>
+                <select th:if="${#strings.toString(docAttribute.dataType) == 'SELECT'}"
+                        th:field="*{docAttributes[__${stat.index}__].atrTypeSelectionValue.id}"
+                        class="form-control" th:id="'inputAttribute' + ${stat.index}" id="inputAttribute4">
+                    <option th:each="selection : ${docAttribute.docAttributeType.atrTypeSelectionValues}"
+                            th:value="${selection.id}"
+                            th:text="${selection.valueText}">
+                        selection.valueText
+                    </option>
+                </select>
+                <span th:if="${#fields.hasErrors('docAttributes[__${stat.index}__]')}" th:errors="*{docAttributes[__${stat.index}__]}"
+                      class="help-block">Attribute Error</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="inputStatus" class="col-sm-2 control-label">Status</label>
+
+            <div class="col-sm-10">
+                <select th:field="*{docStatusType}" class="form-control" id="inputStatus">
+                    <option th:each="statusType : ${docStatusTypes}" th:value="${statusType.id}" th:text="${statusType.typeName}">statusType.typeName</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+<!-- /.container -->
+</body>
+</html>
